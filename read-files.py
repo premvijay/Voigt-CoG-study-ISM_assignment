@@ -12,14 +12,16 @@ from scipy import integrate
 
 
 spectrum = np.genfromtxt("file\hlsp_igm_hst_cos_1es1553_g130m-g160m_v3_spec.dat")
-
+R_lam = 1 - spectrum[:,1]/spectrum[:,3]
 
 class Line:
-    def __init__(self,ID,lambda_0, f, gamma):
+    def __init__(self,ID,lam_0, f, gamma):
         self.ID = ID
-        self.lambda_0 = lambda_0
-        self.f = f
-        self.gamma = gamma
+        self.lam_0 = float(lam_0)
+        self.f = float(f)
+        self.gamma = float(gamma)
+    def set_index(self,i):
+        self.index = i
 
 lines = []
 
@@ -51,14 +53,29 @@ R = integrate.trapz(1-spectrum[:,1]/spectrum[:,3],spectrum[:,0])
 
     
         
+def find_index(line,spectrum):
+    i = 0
+    while spectrum[i,0] < line.lam_0:
+        i += 1
+    line.set_index(i)
+    
+
+for line in lines:
+    find_index(line,spectrum)
 
 
+def eq_width(line):
+    W = 0
+    dW = 0
+    i = line.index
+    while dW>=0:
+        print(i)
+        dW = (R_lam[i] + R_lam[i+1])/2 * (spectrum[i+1:0]-spectrum[i,0])
+        W += dW
+        i += 1
+    return W
 
-
-
-
-
-
+W = eq_width(lines[2])
 
 
 
