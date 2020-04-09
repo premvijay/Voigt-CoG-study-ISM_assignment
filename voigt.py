@@ -20,6 +20,12 @@ def Voigt(a, u):
 
     return (a/np.pi)*I
 
+#def VoigtRange(a, u):
+#    Integ = 
+#    I = integrate.quad(lambda y: np.exp(-y**2)/(a**2 + (u - y)**2),-np.inf, np.inf)[0]
+#
+#    return (a/np.pi)*I
+
 a = 1
 u = np.linspace(-10,10,20)
 
@@ -60,37 +66,39 @@ plt.close()
 sigma_0 = np.pi * const.e.gauss**2 / const.m_e /const.c
 
 NH_list = np.logspace(11,22,12) * unit.cm**-2
-NH = NH_list[9]
-NH = 1 * 10**12.5 * unit.cm**-2
+#NH = NH_list[9]
+#NH = 1 * 10**12.5 * unit.cm**-2
 b_list = np.linspace(10,50,5) * unit.km/unit.s
-b = b_list[1]
+#b = b_list[1]
+
+lam_0 = 1215.6701 * unit.Angstrom
+om_0 = 2 * np.pi * const.c / lam_0
+f = 0.4164
+gamma = 6.265 * 10**8 * unit.s**-1 * np.pi
 
 
 for b in b_list:
     W = []
+    Del_om_D = 2 * np.pi * b / lam_0
+    a =  np.float((gamma / ( 4 * om_0) * const.c / b).decompose()) 
+    
+    
+    
+    def H1(a,u):
+        return Voigt(a,u)
+    
+    H2 = Voigt1D(x_0=0, amplitude_L=.57/a, fwhm_L=2*a, fwhm_G=2*np.sqrt(np.log(2)))
+        
+    
+    lam = np.linspace(1215.665,1215.675,400) * unit.Angstrom
+    om = 2 * np.pi * const.c / lam
+    
+    u = np.array((om - om_0)/ om_0 * const.c / b)
+    
+    sigma = 2 * np.sqrt(np.pi) * lam * f * sigma_0 / b * H1(a,u)
+    
     for NH in NH_list:
-        lam_0 = 1215.6701 * unit.Angstrom
-        om_0 = 2 * np.pi * const.c / lam_0
-        f = 0.4164
-        gamma = 6.265 * 10**8 * unit.s**-1 * np.pi
-        
-        Del_om_D = 2 * np.pi * b / lam_0
-        a =  np.float((gamma / ( 4 * om_0) * const.c / b).decompose())
-        
-        
-        
-        def H1(a,u):
-            return Voigt(a,u)
-        
-        H2 = Voigt1D(x_0=0, amplitude_L=.57/a, fwhm_L=2*a, fwhm_G=2*np.sqrt(np.log(2)))
-            
-        
-        lam = np.linspace(1215.665,1215.675,400) * unit.Angstrom
-        om = 2 * np.pi * const.c / lam
-        
-        u = np.array((om - om_0)/ om_0 * const.c / b)
-        
-        tau = 2 * np.sqrt(np.pi) * NH * lam * f * sigma_0 / b * H2(u)
+        tau = sigma * NH
         
         flux = np.exp(-tau)
         
