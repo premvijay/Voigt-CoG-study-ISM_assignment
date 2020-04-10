@@ -152,6 +152,22 @@ for k in [1,2,3]:
 
 
 
+#for line in lines[:]:
+#    print(vars(line))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
