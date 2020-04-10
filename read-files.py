@@ -22,6 +22,13 @@ class Line:
         self.gamma = float(gamma)
     def set_index(self,i):
         self.index = i
+        
+    def set_width(self,W):
+        self.W = W
+        self.W_by_lam = W / self.lam_0
+    def set_integral_range(self,start,stop):
+        self.start = start
+        self.stop = stop
 
 lines = []
 
@@ -36,11 +43,8 @@ with open('file/Ly_FeII_NiII.dat','rt') as atomfile:
 #with open("file\hlsp_igm_hst_cos_1es1553_g130m-g160m_v3_spec.dat",'rt') as spectrumfile:
 #    for line in spectrumfile.readlines():
 #        print(line)
-
-#fig, ax = plt.subplots()
-#ax.plot(spectrum[:,0],spectrum[:,1]/spectrum[:,3])
-#ax.set_xlim(1250,1270)
-#ax.set_ylim(0,1.1)
+            
+            
 
 
 
@@ -64,18 +68,88 @@ for line in lines:
     find_index(line,spectrum)
 
 
-def eq_width(line):
+def find_eq_width(line,spectrum):
+    R_lam = 1 - spectrum[:,1]/spectrum[:,3]
     W = 0
     dW = 0
     i = line.index
     while dW>=0:
-        print(i)
-        dW = (R_lam[i] + R_lam[i+1])/2 * (spectrum[i+1:0]-spectrum[i,0])
+#        print(i)
+        dW = (R_lam[i] + R_lam[i+1])/2 * (spectrum[i+1,0]-spectrum[i,0])
+#        print(dW)
         W += dW
         i += 1
+    stop = spectrum[i,0] 
+        
+    dW = 0
+    i = line.index
+    while dW>=0:
+#        print(i)
+        dW = (R_lam[i] + R_lam[i-1])/2 * (spectrum[i,0]-spectrum[i-1,0])
+#        print(dW)
+        W += dW
+        i -= 1
+    start = spectrum[i,0]
+    
+    line.set_width(W)
+    line.set_integral_range(start,stop)
     return W
 
-W = eq_width(lines[2])
+W = find_eq_width(lines[2],spectrum)
+
+for line in lines[1:]:
+    find_eq_width(line,spectrum)
+
+def find_eq_width_cont_fix(line,spectrum,flux_0):
+    W = 0
+    R_lam_fix = 1 - spectrum[:,3]/flux_0
+    dW = 0
+    i = line.index
+    while dW>=0:
+#        print(i)
+        dW = (R_lam_fix[i] + R_lam_fix[i+1])/2 * (spectrum[i+1,0]-spectrum[i,0])
+#        print(dW)
+        W += dW
+        i += 1
+    stop = spectrum[i,0]    
+    
+    dW = 0
+    i = line.index
+    while dW>=0:
+#        print(i)
+        dW = (R_lam_fix[i] + R_lam_fix[i-1])/2 * (spectrum[i,0]-spectrum[i-1,0])
+#        print(dW)
+        W += dW
+        i -= 1
+    start = spectrum[i,0]
+        
+    line.set_width(W)
+    line.set_integral_range(start,stop)
+    return W
+
+
+WH = find_eq_width_cont_fix(lines[0],spectrum,1.6e-14)
+
+
+
+
+
+
+fig, ax = plt.subplots()
+
+ax.plot(spectrum[:,0],spectrum[:,1]/spectrum[:,3])
+ax.set_xlim(1140,1150)
+ax.set_ylim(0,1.1)
+            
+
+#ax.plot(spectrum[:,0],spectrum[:,3])
+#ax.set_xlim(1250,1270)
+#ax.set_ylim(0,1.1)
+
+for k in [1,2,3]:
+    ax.vlines(lines[k].start,0,1)
+    ax.vlines(lines[k].stop,0,1)
+
 
 
 
