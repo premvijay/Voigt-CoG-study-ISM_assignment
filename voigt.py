@@ -88,7 +88,7 @@ gamma = 6.265 * 10**8 * unit.s**-1 #* np.pi
 
 for b in b_list:
     W = []
-    Del_om_D = 2 * np.pi * b / lam_0
+#    Del_om_D = 2 * np.pi * b / lam_0
     a =  np.float((gamma / ( 4 * om_0) * const.c / b).decompose()) 
     
     

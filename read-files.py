@@ -20,6 +20,8 @@ class Line:
         self.lam_0 = float(lam_0)
         self.f = float(f)
         self.gamma = float(gamma)
+        
+class Line_data(Line):
     def set_index(self,i):
         self.index = i
         
@@ -36,7 +38,7 @@ with open('file/Ly_FeII_NiII.dat','rt') as atomfile:
     for line in atomfile.readlines():
         print(line)
         if line[0] != '#':
-            lines.append(Line(*line.rsplit()[0:4]))
+            lines.append(Line_data(*line.rsplit()[0:4]))
 #        pass
 
 
