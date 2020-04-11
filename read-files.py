@@ -39,26 +39,15 @@ with open('file/Ly_FeII_NiII.dat','rt') as atomfile:
         print(line)
         if line[0] != '#':
             lines.append(Line_data(*line.rsplit()[0:4]))
-#        pass
 
 
 #with open("file\hlsp_igm_hst_cos_1es1553_g130m-g160m_v3_spec.dat",'rt') as spectrumfile:
 #    for line in spectrumfile.readlines():
 #        print(line)
-            
-            
-
-
-
-
-
         
-        
-        
-R = integrate.trapz(1-spectrum[:,1]/spectrum[:,3],spectrum[:,0])   
-
-    
-        
+       
+#R = integrate.trapz(1-spectrum[:,1]/spectrum[:,3],spectrum[:,0])   
+      
 def find_index(line,spectrum):
     i = 0
     while spectrum[i,0] < line.lam_0:

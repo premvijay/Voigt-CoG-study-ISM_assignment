@@ -24,16 +24,11 @@ def H(a,x):
     return np.real(wofz(x + 1j*a))
 
 @np.vectorize
-def Voigt(a, u):
+def H1(a, u):
     I = integrate.quad(lambda y: np.exp(-y**2)/(a**2 + (u - y)**2),-np.inf, np.inf)[0]
 
     return (a/np.pi)*I
 
-#def VoigtRange(a, u):
-#    Integ = 
-#    I = integrate.quad(lambda y: np.exp(-y**2)/(a**2 + (u - y)**2),-np.inf, np.inf)[0]
-#
-#    return (a/np.pi)*I
 
 #a = 1
 #u = np.linspace(-10,10,20)
@@ -88,17 +83,10 @@ gamma = 6.265 * 10**8 * unit.s**-1 #* np.pi
 
 for b in b_list:
     W = []
-#    Del_om_D = 2 * np.pi * b / lam_0
     a =  np.float((gamma / ( 4 * om_0) * const.c / b).decompose()) 
-    
-    
-    
-    def H1(a,u):
-        return Voigt(a,u)
-    
+
     H2 = Voigt1D(x_0=0, amplitude_L=.57/a, fwhm_L=2*a, fwhm_G=2*np.sqrt(np.log(2)))
         
-    
     lam = np.linspace(1200.,1230,4000) * unit.Angstrom
     om = 2 * np.pi * const.c / lam
     
