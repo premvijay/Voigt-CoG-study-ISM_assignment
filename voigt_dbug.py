@@ -12,6 +12,17 @@ import astropy.units as unit
 from astropy.constants import c as c1#, e, m_e #const
 #from astropy.modeling.models import Voigt1D
 
+from scipy.special import wofz
+
+def Voigt2(a,x):
+    """
+    Return the Voigt line shape at x with Lorentzian component HWHM a
+    and Gaussian component 2 sigma**2 = one.
+    """
+    return np.real(wofz(x + 1j*a))
+
+
+
 c = 3e8
 pi = np.pi
 
@@ -20,6 +31,8 @@ def Voigt(a, u):
     I = integrate.quad(lambda y: np.exp(-y**2)/(a**2 + (u - y)**2),-np.inf, np.inf)[0]
 
     return (a/pi)*I
+
+from time import time
 
 #sigma_0 = pi * e.gauss**2 / m_e /c
 
@@ -50,12 +63,12 @@ a1 =  np.float((gamma1 / ( 4 * om_01) * c1 / b1).decompose())
 
 
 def H1(a,u):
-    return Voigt(a,u)
+    return Voigt2(a,u)
 
 #H2 = Voigt1D(x_0=0, amplitude_L=.57/a, fwhm_L=2*a, fwhm_G=2*np.sqrt(np.log(2)))
 
 
-lam = np.linspace(1215.665,1215.675,400) * 1e-10# unit.Angstrom
+lam = np.linspace(1215,1216,400) * 1e-10# unit.Angstrom
 om = 2 * pi * c / lam
 
 lam1 = np.linspace(1215.665,1215.675,400) * unit.Angstrom
@@ -73,7 +86,7 @@ phi1 = 2 * np.sqrt(pi) * lam1 / b1 * H1(a,u)
 normalize = integrate.trapz(phi, om)/ (2*pi)
 print(normalize)
 
-plt.plot(om,phi)
+#plt.plot(om,phi)
 
 
 
@@ -81,18 +94,21 @@ plt.plot(om,phi)
 
 
 #a = 1
-#u = np.linspace(-30,30,200)
+#u = np.linspace(-30,30,20000)
 #
-#plt.figure()
+#t1 = time()
+#V = Voigt(a,u)
+#t2 = time()
 #
+#V2 = Voigt2(a,u)
+#t3 = time()
 #
-#V2 = Voigt(a,u)
-#
+#plt.plot(u,V)
 #plt.plot(u,V2)
 #
 #I = integrate.trapz(V2,u)
-
-
+#
+#print(t2-t1,t3-t2)
 
 
 

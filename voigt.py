@@ -14,6 +14,15 @@ from astropy.modeling.models import Voigt1D
 
 from time import time
 
+from scipy.special import wofz
+
+def H(a,x):
+    """
+    Return the Voigt line shape at x with Lorentzian component HWHM a
+    and Gaussian component 2 sigma**2 = one.
+    """
+    return np.real(wofz(x + 1j*a))
+
 @np.vectorize
 def Voigt(a, u):
     I = integrate.quad(lambda y: np.exp(-y**2)/(a**2 + (u - y)**2),-np.inf, np.inf)[0]
@@ -26,37 +35,37 @@ def Voigt(a, u):
 #
 #    return (a/np.pi)*I
 
-a = 1
-u = np.linspace(-10,10,20)
-
-plt.figure()
-
-t1 = time()
-V2 = Voigt(a,u)
-
-
-t2 = time()
-plt.plot(u,V2)
-
-#x = u#np.arange(0, 10, 0.01)
-v1 = Voigt1D(x_0=0, amplitude_L=.57/a, fwhm_L=2*a, fwhm_G=2*np.sqrt(np.log(2)))
-
-t3 = time()
-V1 = v1(u)
-
-t4 = time()
-
-plt.plot(u, V1,label="astropy")
-
-plt.legend()
-plt.show()
-
-dV = V2-V1
-fV = V2/V1
-
-print(t2-t1,t4-t3)
-
-plt.close()
+#a = 1
+#u = np.linspace(-10,10,20)
+#
+#plt.figure()
+#
+#t1 = time()
+#V2 = Voigt(a,u)
+#
+#
+#t2 = time()
+#plt.plot(u,V2)
+#
+##x = u#np.arange(0, 10, 0.01)
+#v1 = Voigt1D(x_0=0, amplitude_L=.57/a, fwhm_L=2*a, fwhm_G=2*np.sqrt(np.log(2)))
+#
+#t3 = time()
+#V1 = v1(u)
+#
+#t4 = time()
+#
+#plt.plot(u, V1,label="astropy")
+#
+#plt.legend()
+#plt.show()
+#
+#dV = V2-V1
+#fV = V2/V1
+#
+#print(t2-t1,t4-t3)
+#
+#plt.close()
 
 #class Voigt:
 #    def __init__(self):
@@ -65,7 +74,7 @@ plt.close()
 
 sigma_0 = np.pi * const.e.gauss**2 / const.m_e /const.c
 
-NH_list = np.logspace(11,22,12) * unit.cm**-2
+NH_list = np.logspace(11,22,23) * unit.cm**-2
 #NH = NH_list[9]
 #NH = 1 * 10**12.5 * unit.cm**-2
 b_list = np.linspace(10,50,5) * unit.km/unit.s
@@ -90,12 +99,12 @@ for b in b_list:
     H2 = Voigt1D(x_0=0, amplitude_L=.57/a, fwhm_L=2*a, fwhm_G=2*np.sqrt(np.log(2)))
         
     
-    lam = np.linspace(1210.,1220,400) * unit.Angstrom
+    lam = np.linspace(1200.,1230,4000) * unit.Angstrom
     om = 2 * np.pi * const.c / lam
     
     u = np.array(((om - om_0)/ om_0 * const.c / b).decompose())
     
-    sigma = 2 * np.sqrt(np.pi) * lam * f * sigma_0 / b * H1(a,u)
+    sigma = 2 * np.sqrt(np.pi) * lam * f * sigma_0 / b * H(a,u)
     
     for NH in NH_list:
         tau = sigma * NH
