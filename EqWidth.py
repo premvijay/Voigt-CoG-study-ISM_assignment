@@ -29,7 +29,6 @@ sigma_0 = np.float(sigma_0_dim.decompose()/unit.m**2*unit.s)
 
 
 def R(lam1,N,b,line):
-
     lam_0 = line.lam_0 *1e-10#* unit.Angstrom
     om_0 = 2 * np.pi * c / lam_0
     f = line.f
@@ -52,7 +51,7 @@ def R(lam1,N,b,line):
     return 1-np.exp(-tau)
 
 def eq_width(N,b,line):
-    return integrate.quad(1-flux, -np.inf,np.inf,args=(N,b,line))[0]
+    return integrate.quad(R, -np.inf,np.inf,args=(N,b,line))[0]
 
 #
 #t1 = time()
@@ -67,8 +66,8 @@ def get_voigt(N,b,line,start=line.start,stop=line.stop):
 
 def plot_voigt(N,b,line):
     voigt = get_voigt(N,b,line)
-    plt.figure(dpi=300)
-    plt.plot(voigt[0],1-voigt[1])
+#    plt.figure(dpi=300)
+#    plt.plot(voigt[0],1-voigt[1])
 
 def eq_width_trapz(N,b,line):    
     voigt = get_voigt(N,b,line)
