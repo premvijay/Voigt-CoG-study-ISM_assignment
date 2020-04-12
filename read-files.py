@@ -12,30 +12,110 @@ from matplotlib.backends.backend_pdf import PdfPages
 import read_atoms
 
 
-
 spectrum = np.genfromtxt("file\hlsp_igm_hst_cos_1es1553_g130m-g160m_v3_spec.dat")
 R_lam = 1 - spectrum[:,1]/spectrum[:,3]
 
         
-class Line_data(read_atoms.Line):
-    def set_index(self,i):
-        self.index = i
-        
-    def set_width(self,W):
-        self.W = W
-        self.W_by_lam = W / self.lam_0
+class Line_spec_data(read_atoms.Line):
     def set_integral_range(self,start,stop):
         self.start = start
         self.stop = stop
     def set_overlap(self,overlap):
         self.overlap = overlap
+        
+    def find_center_index(self,spectrum):
+        i = 0
+        while spectrum[i,0] < self.lam_0:
+            i += 1
+        self.center_index = i
+        return i
+        
+    def find_eq_width(self,spectrum):
+        R_lam = 1 - spectrum[:,1]/spectrum[:,3]
+        W = 0
+        if self.overlap is None:
+            i = self.find_center_index(spectrum)
+            while R_lam[i]>0:
+        #        print(i)
+                dW = (R_lam[i] + R_lam[i+1])/2 * (spectrum[i+1,0]-spectrum[i,0])
+        #        print(dW)
+                W += dW
+                i += 1
+            stop = spectrum[i,0] 
+                
+            i = self.find_center_index(spectrum)
+            while R_lam[i]>0:
+        #        print(i)
+                dW = (R_lam[i] + R_lam[i-1])/2 * (spectrum[i,0]-spectrum[i-1,0])
+        #        print(dW)
+                W += dW
+                i -= 1
+            start = spectrum[i,0]
+            
+        elif self.overlap == 'Left':
+            i = self.find_center_index(spectrum)
+            while R_lam[i]>0:
+        #        print(i)
+                dW = (R_lam[i] + R_lam[i+1])/2 * (spectrum[i+1,0]-spectrum[i,0])
+        #        print(dW)
+                W += dW
+                i += 1
+            stop = spectrum[i,0]
+            start = - stop + 2*self.lam_0
+            W *= 2
+            
+        elif self.overlap == 'Right':
+            i = self.find_center_index(spectrum)
+            while R_lam[i]>0:
+        #        print(i)
+                dW = (R_lam[i] + R_lam[i-1])/2 * (spectrum[i,0]-spectrum[i-1,0])
+        #        print(dW)
+                W += dW
+                i -= 1
+            start = spectrum[i,0]
+            stop = - start + 2*self.lam_0
+            W *= 2
+            
+        self.set_integral_range(start,stop)
+        self.W = W
+        self.W_by_lam = W / self.lam_0
+        return W
+    
+    def find_eq_width_cont_fix(self,spectrum,flux_0):
+        W = 0
+        R_lam_fix = 1 - spectrum[:,3]/flux_0
+        dW = 10
+        i = self.find_center_index(spectrum)
+        while dW>=0:
+    #        print(i)
+            dW = (R_lam_fix[i] + R_lam_fix[i+1])/2 * (spectrum[i+1,0]-spectrum[i,0])
+    #        print(dW)
+            W += dW
+            i += 1
+        stop = spectrum[i,0]    
+        
+        dW = 0
+        i = self.find_center_index(spectrum)
+        while dW>=0:
+    #        print(i)
+            dW = (R_lam_fix[i] + R_lam_fix[i-1])/2 * (spectrum[i,0]-spectrum[i-1,0])
+    #        print(dW)
+            W += dW
+            i -= 1
+        start = spectrum[i,0]
+            
+        self.set_integral_range(start,stop)
+        self.W = W
+        self.W_by_lam = W / self.lam_0
+        return W
+
 
 
 lines = read_atoms.read_lines('file/atom_identified.dat')
 
 for ID in lines:
     for line in lines[ID]:
-        line.__class__ = Line_data
+        line.__class__ = Line_spec_data
         line.set_overlap(None)
         
 lines['NI'][1].set_overlap('Right')
@@ -54,103 +134,16 @@ def find_index(line,spectrum):
     
 for ID in lines:
     for line in lines[ID]:
-        find_index(line,spectrum)
+        line.find_center_index(spectrum)
 
-
-
-def find_eq_width(spectrum,line):
-    R_lam = 1 - spectrum[:,1]/spectrum[:,3]
-    W = 0
-    if line.overlap is None:
-        i = line.index
-        while R_lam[i]>0:
-    #        print(i)
-            dW = (R_lam[i] + R_lam[i+1])/2 * (spectrum[i+1,0]-spectrum[i,0])
-    #        print(dW)
-            W += dW
-            i += 1
-        stop = spectrum[i,0] 
-            
-        i = line.index
-        while R_lam[i]>0:
-    #        print(i)
-            dW = (R_lam[i] + R_lam[i-1])/2 * (spectrum[i,0]-spectrum[i-1,0])
-    #        print(dW)
-            W += dW
-            i -= 1
-        start = spectrum[i,0]
-        
-    elif line.overlap == 'Left':
-        i = line.index
-        while R_lam[i]>0:
-    #        print(i)
-            dW = (R_lam[i] + R_lam[i+1])/2 * (spectrum[i+1,0]-spectrum[i,0])
-    #        print(dW)
-            W += dW
-            i += 1
-        stop = spectrum[i,0]
-        start = - stop + 2*line.lam_0
-        W *= 2
-        
-    elif line.overlap == 'Right':
-        i = line.index
-        while R_lam[i]>0:
-    #        print(i)
-            dW = (R_lam[i] + R_lam[i-1])/2 * (spectrum[i,0]-spectrum[i-1,0])
-    #        print(dW)
-            W += dW
-            i -= 1
-        start = spectrum[i,0]
-        stop = - start + 2*line.lam_0
-        W *= 2
-    
-    line.set_width(W)
-    line.set_integral_range(start,stop)
-    return W
-
-#W = find_eq_width(spectrum,lines[2])
-
-#for line in lines[1:]:
-
-        
-
-def find_eq_width_cont_fix(spectrum,line,flux_0):
-    W = 0
-    R_lam_fix = 1 - spectrum[:,3]/flux_0
-    dW = 10
-    i = line.index
-    while dW>=0:
-#        print(i)
-        dW = (R_lam_fix[i] + R_lam_fix[i+1])/2 * (spectrum[i+1,0]-spectrum[i,0])
-#        print(dW)
-        W += dW
-        i += 1
-    stop = spectrum[i,0]    
-    
-    dW = 0
-    i = line.index
-    while dW>=0:
-#        print(i)
-        dW = (R_lam_fix[i] + R_lam_fix[i-1])/2 * (spectrum[i,0]-spectrum[i-1,0])
-#        print(dW)
-        W += dW
-        i -= 1
-    start = spectrum[i,0]
-        
-    line.set_width(W)
-    line.set_integral_range(start,stop)
-    return W
-
-
-WH = find_eq_width_cont_fix(spectrum,lines['HI'][0],1.6e-14)
 
 for ID in lines:
     if ID != 'HI':
         for line in lines[ID]:
-            find_eq_width(spectrum,line)
+            line.find_eq_width(spectrum)
             print(vars(line))
     else:
-        find_eq_width_cont_fix(spectrum,lines['HI'][0],1.6e-14)
+        lines['HI'][0].find_eq_width_cont_fix(spectrum,1.6e-14)
 
 #def find_eq_width_manual(spectrum,integ_range):
 #    spectrum_cut = spectrum[integ_range[0]:integ_range[1]]
@@ -199,10 +192,6 @@ with PdfPages('multipage_pdf.pdf') as pdf:
         pdf.savefig()
         lam_start = lam_start+25
     
-
-
-
-
 
 
 #ax.plot(spectrum[:,0],spectrum[:,3])
