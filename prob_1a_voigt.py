@@ -14,7 +14,7 @@ N_list = np.logspace(13,20,8) #* unit.cm**-2
 #b_list = np.logspace(0,2,10) #* unit.km/unit.s
 b_list = 2**np.linspace(0,6,7) #* unit.km/unit.s
 
-line = lines[0]
+line = lines['HI'][0]
 
 #N = N_list[9]
 N = 1 * 10**13.5 #* unit.cm**-2

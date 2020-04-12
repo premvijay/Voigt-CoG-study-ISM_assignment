@@ -8,21 +8,16 @@ Created on Tue Apr  7 20:23:10 2020
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
-from scipy import integrate
+#from scipy import integrate
+import read_atoms
 
 
 
 spectrum = np.genfromtxt("file\hlsp_igm_hst_cos_1es1553_g130m-g160m_v3_spec.dat")
 R_lam = 1 - spectrum[:,1]/spectrum[:,3]
 
-class Line:
-    def __init__(self,ID,lam_0, f, gamma):
-        self.ID = ID
-        self.lam_0 = float(lam_0)
-        self.f = float(f)
-        self.gamma = float(gamma)
         
-class Line_data(Line):
+class Line_data(read_atoms.Line):
     def set_index(self,i):
         self.index = i
         
@@ -35,29 +30,12 @@ class Line_data(Line):
     def set_overlap(self,overlap):
         self.overlap = overlap
 
-#lines = []
-#
-#with open('file/Ly_FeII_NiII.dat','rt') as atomfile:
-#    for line in atomfile.readlines():
-#        print(line)
-#        if line[0] != '#':
-#            lines.append(Line_data(*line.rsplit()[0:4]))
-        
-lines = {}
 
-with open('file/atom_identified.dat','rt') as atomfile:
-    for line in atomfile.readlines():
-        print(line)
-        if line[0] != '#':
-            line = Line_data(*line.rsplit()[0:4])
-            if line.ID in lines:
-                lines[line.ID].append(line)
-            else:
-                lines[line.ID] = [line]        
-
+lines = read_atoms.read_lines('file/atom_identified.dat')
 
 for ID in lines:
     for line in lines[ID]:
+        line.__class__ = Line_data
         line.set_overlap(None)
         
 lines['NI'][1].set_overlap('Right')
@@ -65,16 +43,8 @@ lines['NI'][2].set_overlap('Left')
 lines['SII'][2].set_overlap('Right')
 lines['SiII'][2].set_overlap('Left')
 lines['CI'][1].set_overlap('Right')
-        
-        
-        
 
-#with open("file\hlsp_igm_hst_cos_1es1553_g130m-g160m_v3_spec.dat",'rt') as spectrumfile:
-#    for line in spectrumfile.readlines():
-#        print(line)
-        
-       
-#R = integrate.trapz(1-spectrum[:,1]/spectrum[:,3],spectrum[:,0])   
+
       
 def find_index(line,spectrum):
     i = 0
@@ -86,9 +56,6 @@ for ID in lines:
     for line in lines[ID]:
         find_index(line,spectrum)
 
-
-#for line in lines:
-#    find_index(line,spectrum)
 
 
 def find_eq_width(spectrum,line):
