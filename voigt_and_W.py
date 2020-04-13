@@ -109,13 +109,13 @@ def plot_CoG(N_list,b_list,line_list,gen_plot=True,save_file=None,check_approx=F
     plt.xscale('log')
     plt.yscale('log')
     if gen_plot:
-        plt.xlabel(r'$ N_{H} \lambda$ f $(cm^{-2} \AA)$')
+        plt.xlabel(r'$ N \lambda$ f $(cm^{-2} \AA)$')
         plt.ylabel(r'$ W_{\lambda} / \lambda $')
         plt.title("Curve of Growth")
         if save_file is not None:
             plt.savefig(save_file+"_gen.pdf",bbox_inches='tight')
     else:
-        plt.xlabel(r'$ N_{H}$ $(cm^{-2})$')
+        plt.xlabel(r'$ N$ $(cm^{-2})$')
         plt.ylabel(r'$ W_{\lambda} (\AA)$')
         plt.title("Curve of Growth")
         if save_file is not None:
