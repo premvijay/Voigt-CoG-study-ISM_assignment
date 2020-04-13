@@ -82,8 +82,8 @@ def eq_width_trapz(N,b,line,start,stop):
 #    plt.plot(lam,1-R_list)
     return float(integrate.trapz(1-voigt[1], voigt[0]))
   
-def plot_CoG(N_list,b_list,line_list,gen_plot=True,save_file=None,check_approx=False,legend_id=False):
-    plt.figure(dpi=200,figsize=(9,7))
+def plot_CoG(N_list,b_list,line_list,gen_plot=True,save_file=None,check_approx=False,legend_id=False,fig_size=(8.5,7)):
+    plt.figure(dpi=200,figsize=fig_size)
     for line in line_list:
         for b in b_list:
             W = np.zeros(len(N_list))
@@ -109,13 +109,13 @@ def plot_CoG(N_list,b_list,line_list,gen_plot=True,save_file=None,check_approx=F
     plt.xscale('log')
     plt.yscale('log')
     if gen_plot:
-        plt.xlabel(r'$ N_{H} \lambda f (cm^{-2} \AA)$')
+        plt.xlabel(r'$ N_{H} \lambda$ f $(cm^{-2} \AA)$')
         plt.ylabel(r'$ W_{\lambda} / \lambda $')
         plt.title("Curve of Growth")
         if save_file is not None:
             plt.savefig(save_file+"_gen.pdf",bbox_inches='tight')
     else:
-        plt.xlabel(r'$ N_{H} (cm^{-2})$')
+        plt.xlabel(r'$ N_{H}$ $(cm^{-2})$')
         plt.ylabel(r'$ W_{\lambda} (\AA)$')
         plt.title("Curve of Growth")
         if save_file is not None:

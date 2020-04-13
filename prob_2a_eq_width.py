@@ -22,22 +22,15 @@ for ID in lines:
         ax.vlines(line.stop,0,1.2)
         ax.text(line.lam_0,0.2,line.ID)
 
-#with PdfPages('multipage_pdf.pdf') as pdf:
-#    lam_start = 1125
-#    while lam_start<1780:
-#        lam_end= lam_start + 28
-#        ax.set_xlim(lam_start,lam_end)
-#        pdf.savefig()
-#        lam_start = lam_start+25
+with PdfPages('multipage_pdf.pdf') as pdf:
+    lam_start = 1125
+    while lam_start<1780:
+        lam_end= lam_start + 28
+        ax.set_xlim(lam_start,lam_end)
+        pdf.savefig()
+        lam_start = lam_start+25
 
 
-
-#ax.plot(spectrum[:,0],spectrum[:,3])
-#ax.set_xlim(1250,1270)
-#ax.set_ylim(0,1.1)
-    
-#for line in lines[:]:
-#    print(vars(line))
 
 for ID in lines:
     for line in lines[ID]:

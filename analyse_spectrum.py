@@ -6,8 +6,8 @@ Created on Tue Apr  7 20:23:10 2020
 """
 
 import numpy as np
-import matplotlib.pyplot as plt
-from matplotlib.backends.backend_pdf import PdfPages
+#import matplotlib.pyplot as plt
+#from matplotlib.backends.backend_pdf import PdfPages
 #from scipy import integrate
 import read_atoms
 

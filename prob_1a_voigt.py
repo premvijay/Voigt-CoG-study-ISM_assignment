@@ -7,13 +7,12 @@ Created on Sat Apr 11 23:32:06 2020
 
 import numpy as np
 import matplotlib.pyplot as plt
-#import read_atoms
+import read_atoms
 from voigt_and_W import get_voigt
-from analyse_spectrum import lines 
 
 
 
-#lines = read_atoms.read_lines('file/atom_identified.dat')
+lines = read_atoms.read_lines('file/atom_identified.dat')
 line = lines['HI'][0]
 
 
