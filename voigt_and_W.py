@@ -28,6 +28,26 @@ sigma_0_dim = np.pi * const.e.gauss**2 / const.m_e /const.c
 sigma_0 = np.float(sigma_0_dim.decompose()/unit.m**2*unit.s)
 
 
+
+linear_factor = float(np.pi* const.e.gauss**2/const.m_e / const.c**2 / unit.cm**2 *unit.Angstrom)
+
+def W_by_lam_linear(N_lam_f):
+    return linear_factor * (N_lam_f)
+
+def W_by_lam_saturated(N_lam_f,b):
+    b = b * 1e3#unit.km / unit.s
+    N_lam_f_SI = N_lam_f * 1e-6# unit.cm**-2 * unit.Angstrom
+    tau_0 = sigma_0  * N_lam_f_SI / (b)
+#    print(tau_0) / np.sqrt(np.pi) 2*np.pi *  * np.sqrt(np.pi) 
+    return 2 * b / c * np.sqrt(np.log(tau_0))
+
+def W_by_lam_damped(N_lam_f,line):
+    return 2*np.sqrt(N_lam_f * linear_factor * line.gamma * line.lam_0 * 1e-10 /c/np.pi**3)
+    
+
+
+
+
 def R(lam1,N,b,line):
     lam_0 = line.lam_0 *1e-10#* unit.Angstrom
     om_0 = 2 * np.pi * c / lam_0
@@ -61,7 +81,48 @@ def eq_width_trapz(N,b,line,start,stop):
     voigt = get_voigt(N,b,line,start,stop)
 #    plt.plot(lam,1-R_list)
     return float(integrate.trapz(1-voigt[1], voigt[0]))
-    
+  
+def plot_CoG(N_list,b_list,line_list,gen_plot=True,save_file=None,check_approx=False,legend_id=False):
+    plt.figure(dpi=200,figsize=(9,7))
+    for line in line_list:
+        for b in b_list:
+            W = np.zeros(len(N_list))
+            for i in range(len(N_list)):
+                W[i] = (eq_width(N_list[i],b,line))
+        #    W = np.array(W) 
+            if gen_plot:
+                plt.plot(N_list*line.f*line.lam_0, W/line.lam_0, label="{}-{:.0f}-line with b={} km/s".format(line.ID,line.lam_0,b) if legend_id else "b={} km/s".format(b))
+            else:
+                plt.plot(N_list, W, label="{}-{:.0f}-line with b={} km/s".format(line.ID,line.lam_0,b) if legend_id else "b={} km/s".format(b))
+    #            pass
+            if check_approx:
+                N_lam_f = N_list * line.lam_0 * line.f
+                plt.plot(N_lam_f[5:16], W_by_lam_saturated(N_lam_f[5:16],b),'--',label="saturated b = {} km/s".format(b))
+        if check_approx:
+            plt.plot(N_lam_f[6:], W_by_lam_damped(N_lam_f[6:],line),'--',label="damped approx")
+
+    if check_approx:
+#        N_lam_f = N_list * line.lam_0 * line.f
+        plt.plot(N_lam_f[:10], W_by_lam_linear(N_lam_f[:10]),'--',label="linear approx")  
+
+    plt.legend(framealpha=0.2)    
+    plt.xscale('log')
+    plt.yscale('log')
+    if gen_plot:
+        plt.xlabel(r'$ N_{H} \lambda f (cm^{-2} \AA)$')
+        plt.ylabel(r'$ W_{\lambda} / \lambda $')
+        plt.title("Curve of Growth")
+        if save_file is not None:
+            plt.savefig(save_file+"_gen.pdf",bbox_inches='tight')
+    else:
+        plt.xlabel(r'$ N_{H} (cm^{-2})$')
+        plt.ylabel(r'$ W_{\lambda} (\AA)$')
+        plt.title("Curve of Growth")
+        if save_file is not None:
+            plt.savefig(save_file+".pdf",bbox_inches='tight')
+    #plt.figure(figsize=(13,8))
+#    plt.close()
+    return plt.gcf(), plt.gca()
 
 #N_list = np.logspace(11,22,23) #* unit.cm**-2
 ##NH = NH_list[9]

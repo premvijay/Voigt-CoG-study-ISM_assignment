@@ -30,11 +30,11 @@ for b in b_list:
     voigt = get_voigt(N,b,line,1215,1216.5)
     plt.plot(voigt[0],1-voigt[1],label="{} km/s".format(b))
     
-plt.title(r"Voigt Profile for Ly-$\alpha$ with N=10$^{%.1f}$cm$^2$"%np.log10(N))
+plt.title(r"Voigt Profile for Ly-$\alpha$ with N=10$^{%.1f}$cm$^{-2}$"%np.log10(N))
 plt.xlabel(r"Wavelength ($\AA$)")
 plt.ylabel(r"Normalised flux")
 plt.legend()
-plt.savefig('Voigt-Ly-a_vary_b.pdf')
+plt.savefig('Voigt-Ly-a_vary_b.pdf',bbox_inches='tight')
   
 plt.close()
     
@@ -44,13 +44,13 @@ b = 12
 plt.figure(dpi=150,figsize=(7,5))    
 for N in N_list:
     voigt = get_voigt(N,b,line,1215,1216.5)
-    plt.plot(voigt[0],1-voigt[1],label="N=10$^{%.0f}$cm$^2$"%np.log10(N))
+    plt.plot(voigt[0],1-voigt[1],label="N=10$^{%.0f}$cm$^{-2}$"%np.log10(N))
     
 plt.title(r"Voigt Profile for Ly-$\alpha$ with b={} km/s".format(b))
 plt.xlabel(r"Wavelength ($\AA$)")
 plt.ylabel(r"Normalised flux")
 plt.legend()
 
-plt.savefig('Voigt-Ly-a_vary_N.pdf')
+plt.savefig('Voigt-Ly-a_vary_N.pdf',bbox_inches='tight')
 
 

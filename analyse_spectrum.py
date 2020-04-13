@@ -108,6 +108,9 @@ class Line_spec_data(read_atoms.Line):
         self.W = W
         self.W_by_lam = W / self.lam_0
         return W
+    
+    def set_N(self,N):
+        self.N = N
 
 
 
@@ -172,39 +175,39 @@ for ID in lines:
 #    axes[1].vlines(lines[k].stop,0,1)
    
     
-if __name__=='__main__':   
-    fig, ax = plt.subplots(figsize=(12,6))
-    
-    ax.plot(spectrum[:,0],spectrum[:,1]/spectrum[:,3])
-    ax.plot(spectrum[:,0],spectrum[:,3],'-')
-    ax.set_ylim(0,1.2)
-    
-    for ID in lines:
-        for line in lines[ID]:
-            ax.vlines(line.start,0,1.2)
-            ax.vlines(line.stop,0,1.2)
-            ax.text(line.lam_0,0.2,line.ID)
-    
-    with PdfPages('multipage_pdf.pdf') as pdf:
-        lam_start = 1125
-        while lam_start<1780:
-            lam_end= lam_start + 28
-            ax.set_xlim(lam_start,lam_end)
-            pdf.savefig()
-            lam_start = lam_start+25
-    
-
-
-    #ax.plot(spectrum[:,0],spectrum[:,3])
-    #ax.set_xlim(1250,1270)
-    #ax.set_ylim(0,1.1)
-        
-    #for line in lines[:]:
-    #    print(vars(line))
-    
-    for ID in lines:
-        for line in lines[ID]:
-            print(line.W)
+#if __name__=='__main__':   
+#    fig, ax = plt.subplots(figsize=(12,6))
+#    
+#    ax.plot(spectrum[:,0],spectrum[:,1]/spectrum[:,3])
+#    ax.plot(spectrum[:,0],spectrum[:,3],'-')
+#    ax.set_ylim(0,1.2)
+#    
+#    for ID in lines:
+#        for line in lines[ID]:
+#            ax.vlines(line.start,0,1.2)
+#            ax.vlines(line.stop,0,1.2)
+#            ax.text(line.lam_0,0.2,line.ID)
+#    
+#    with PdfPages('multipage_pdf.pdf') as pdf:
+#        lam_start = 1125
+#        while lam_start<1780:
+#            lam_end= lam_start + 28
+#            ax.set_xlim(lam_start,lam_end)
+#            pdf.savefig()
+#            lam_start = lam_start+25
+#    
+#
+#
+#    #ax.plot(spectrum[:,0],spectrum[:,3])
+#    #ax.set_xlim(1250,1270)
+#    #ax.set_ylim(0,1.1)
+#        
+#    #for line in lines[:]:
+#    #    print(vars(line))
+#    
+#    for ID in lines:
+#        for line in lines[ID]:
+#            print("{},{:.3f},{:.4e},{:.3e},{:.4f}".format(line.ID,line.lam_0,line.f,line.gamma,line.W))
         
 
 
