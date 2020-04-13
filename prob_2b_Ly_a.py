@@ -66,7 +66,7 @@ plt.legend()
 
 plt.savefig('Voigt-Ly-a_overlay.pdf',bbox_inches='tight')
 
-
+print("{},{:.3e}".format(lines['HI'][0].ID,lines['HI'][0].N))
 
 
 

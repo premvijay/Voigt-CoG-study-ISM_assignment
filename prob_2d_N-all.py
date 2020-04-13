@@ -18,15 +18,19 @@ for ID in lines:
     if ID != 'HI' and ID != 'FeII' and ID != 'NiII':
         N_mean = 0
         for line in lines[ID]:
-            line.set_N(line.W_by_lam / line.lam_0 / line.f / linear_factor)
+            N = (line.W_by_lam / line.lam_0 / line.f / linear_factor)
     #        print("ID {} W_by_lam = {:.3e} and N = {:.3e} cm**-2".format(line.ID,line.W_by_lam,line.N))
-            N_mean += line.N
+            N_mean += N  
         N_mean /= len(lines[ID])
-        print("ID {} W_by_lam = {:.3e} and N = {:.3e} cm**-2".format(line.ID,line.W_by_lam,line.N))
+        for line in lines[ID]:
+            line.set_N(N_mean)
+#        print("ID {} W_by_lam = {:.3e} and N = {:.3e} cm**-2".format(line.ID,line.W_by_lam,line.N))
         
         
+for ID in lines:
+    if ID != 'HI' and ID != 'FeII' and ID != 'NiII':
+        print("{},{:.3e}".format(lines[ID][0].ID,lines[ID][0].N))
 
-
-
+#{:.4e}
 
 
